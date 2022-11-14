@@ -127,3 +127,7 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+festivalarm/my_secrets.py
+
+myvenv
