@@ -26,9 +26,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # 채우기
 SECRET_KEY = my_secrets.SECRET_KEY
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS =['.ap-northeast-2.compute.amazonaws.com', '43.200.245.75']
 
 
 # Application definition
@@ -65,11 +65,7 @@ MIDDLEWARE = [
 #ALLOWED_HOSTS = ['127.0.0.1']
 # # 개인 ip 주소이다. 입력할 때 nn이 아닌 자신의 ip 주소를 입력하자.
 
-CORS_ORIGIN_WHITELIST = [
-        'http://127.0.0.1:8000',
-       'http://127.0.0.1:3000',
-       'http://localhost:3000'
-]
+CORS_ORIGIN_WHITELIST = ['http://43.200.245.75:3306']
 
 CORS_ORIGIN_ALLOW_ALL=True
 CORS_ALLOW_CREDENTIALS = True
