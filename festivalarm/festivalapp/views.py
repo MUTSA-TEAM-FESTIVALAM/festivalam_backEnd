@@ -10,6 +10,8 @@ from .serializers import OptionCountSerializer, UserSerializer, FestivalSerializ
 from .forms import PostForm,CommentForm
 from rest_framework.renderers import TemplateHTMLRenderer
 
+from festivalapp import ft_s3
+
 
 
 #from festivalarm.festivalapp import serializers
@@ -238,3 +240,12 @@ class SearchFestivalTitleAPI(APIView):
         return Response(serializer.data,status=status.HTTP_200_OK)
     
 #class SearchOptionAPI(APIview):
+
+
+
+
+
+
+
+
+
