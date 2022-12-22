@@ -31,6 +31,7 @@ from django.utils.decorators import method_decorator
 @method_decorator(csrf_exempt, name='dispatch')
 class KakaoSignInCallBackView(View):
     def post(self, request):
+
         # --- 인가코드 가져오기 --- #
         data = json.loads(request.body)
         code = data.get('code', None)
@@ -53,19 +54,6 @@ class KakaoSignInCallBackView(View):
         nickname = profile_json.get("properties")["nickname"]
         email = profile_json.get("kakao_account")["email"]
         
-        """
-        # --- JWT 토큰 발급하기 --- #
-        payload_value = kakao_id             # kakao_id를 payload로
-        payload = {"sub": payload_value}
-        jwt_access_token = generate_token(payload, "access")
-        jwt_refresh_token = generate_token(payload, "refresh")
-        data = {
-            "jwt_token": {
-                "access_token": jwt_access_token,
-                "refresh_token": jwt_refresh_token,
-            }
-        }
-        """
         # DB에 사용자 정보가 있는경우
         if User.objects.filter(kakao_id=kakao_id).exists():
             u = User.objects.get(kakao_id=kakao_id)
@@ -73,6 +61,7 @@ class KakaoSignInCallBackView(View):
             u.access_token = access_token
             u.refresh_token = refresh_token
             u.save()
+
         # 회원가입인 경우
         else:
             User(
@@ -90,12 +79,7 @@ class KakaoSignInCallBackView(View):
 @method_decorator(csrf_exempt, name='dispatch')
 class KakaoLogoutView(View):
     def post(self, request, kakao_id):
-        """
-        data = json.loads(request.body)
-        jwt_access_token = data.get('jwt_token')['access_token']
-        jwt_decode = decode_token(jwt_access_token)
-        kakao_id = jwt_decode['sub']
-        """
+        
         token_queryset = User.objects.filter(kakao_id=kakao_id).values('access_token')
         access_token = token_queryset[0]['access_token']
         
@@ -112,12 +96,7 @@ class KakaoLogoutView(View):
 @method_decorator(csrf_exempt, name='dispatch')
 class KakaoUnlinkView(View):
     def post(self, request, kakao_id):
-        """
-        data = json.loads(request.body)
-        jwt_access_token = data.get('jwt_token')['access_token']
-        jwt_decode = decode_token(jwt_access_token)
-        kakao_id = jwt_decode['sub']
-        """
+    
         token_queryset = User.objects.filter(kakao_id=kakao_id).values('access_token')
         access_token = token_queryset[0]['access_token']
         
@@ -133,13 +112,7 @@ class KakaoUnlinkView(View):
 @method_decorator(csrf_exempt, name='dispatch')
 class KakaoUserProfileView(View):
     def get(self, request, kakao_id):
-        """
-        data = json.loads(request.body)
-        jwt_access_token = data.get('jwt_token')['access_token']
-        jwt_decode = decode_token(jwt_access_token)
-        kakao_id = jwt_decode['sub']
-        """
-
+        
         # 유저의 모든 정보 #
         user_queryset = User.objects.filter(kakao_id=kakao_id)
         user_json = json.loads(serializers.serialize('json', user_queryset))
