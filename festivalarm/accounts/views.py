@@ -57,9 +57,9 @@ class KakaoSignInCallBackView(View):
         # DB에 사용자 정보가 있는경우
         if User.objects.filter(kakao_id=kakao_id).exists():
             u = User.objects.get(kakao_id=kakao_id)
-            u.email = email
-            u.access_token = access_token
-            u.refresh_token = refresh_token
+            u.email = email                      # 이메일이 바뀔수도 있어서 넣은건데 이 경우를 고려해야되나..
+            u.access_token = access_token        # DB 리뉴얼 후 삭제
+            u.refresh_token = refresh_token      # DB 리뉴얼 후 삭제
             u.save()
 
         # 회원가입인 경우
@@ -68,20 +68,23 @@ class KakaoSignInCallBackView(View):
                 kakao_id=kakao_id,
                 username = nickname,
                 email = email,
-                access_token = access_token,
-                refresh_token = refresh_token,
+                access_token = access_token,        # DB 리뉴얼 후 삭제
+                refresh_token = refresh_token,      # DB 리뉴얼 후 삭제
             ).save()
 
 
-        return JsonResponse({"kakao_id":kakao_id})
+        return JsonResponse({"kakao_id":kakao_id, "access_token":access_token, "refresh_token":refresh_token})
 
 # 로그아웃
+# token을 프론트에서 받아와서 쓴다면 수정 필요
 @method_decorator(csrf_exempt, name='dispatch')
 class KakaoLogoutView(View):
     def post(self, request, kakao_id):
-        
-        token_queryset = User.objects.filter(kakao_id=kakao_id).values('access_token')
-        access_token = token_queryset[0]['access_token']
+
+        # ~ 22.12.27 : DB에서 토큰을 끌어오는 방법이고
+        # 22.12.28 ~ : 프론트에서 토큰을 받아서 사용
+        data = json.loads(request.body)
+        access_token = data.get('access_token', None)
         
         logout_request = requests.post(
             "https://kapi.kakao.com/v1/user/logout", headers={"Authorization": f"Bearer {access_token}"}
@@ -97,8 +100,10 @@ class KakaoLogoutView(View):
 class KakaoUnlinkView(View):
     def post(self, request, kakao_id):
     
-        token_queryset = User.objects.filter(kakao_id=kakao_id).values('access_token')
-        access_token = token_queryset[0]['access_token']
+        # ~ 22.12.27 : DB에서 토큰을 끌어오는 방법이고
+        # 22.12.28 ~ : 프론트에서 토큰을 받아서 사용
+        data = json.loads(request.body)
+        access_token = data.get('access_token', None)
         
         unlink_request = requests.post(
             f"https://kapi.kakao.com/v1/user/unlink?targetarget_id_type={'kakao_id'}&target_id={kakao_id}", headers={"Authorization": f"Bearer {access_token}"}
@@ -108,7 +113,10 @@ class KakaoUnlinkView(View):
         return JsonResponse({"id" : unlink_response , "status": 'unlink'})
 
 
-# --- 마이페이지 --- #       
+# --- 마이페이지 --- #
+# 사용자 정보를 어떻게 조회?
+# 현재는 DB에 있는 사용자 정보를 끌어와서 프론트에 전달.. 이게 맞지
+# kakao_id를 url로 받는게 아니라 request.body로 받아야되나
 @method_decorator(csrf_exempt, name='dispatch')
 class KakaoUserProfileView(View):
     def get(self, request, kakao_id):
@@ -151,10 +159,12 @@ class KakaoUserProfileView(View):
 # --- access_token 기간 만료시 access/refresh token 갱신 --- #
 class KaKaoTokenUpdateView(View):
     def get(self, request):
+
+        # ~ 22.12.27 : 프론트에서 kakao_id를 request로 넘겨 받아서 그 아이디로 DB에서 refresh_token을 찾는 방법 사용
+        # 22.12.28 ~ : token을 프론트로 넘겨주면 처음부터 refresh_token을 받으면 됨
         data = json.loads(request.body)
-        kakao_id = data.get('kakao_id', None)
-        token_queryset = User.objects.filter(kakao_id=kakao_id).values('refresh_token')
-        refresh_token = token_queryset[0]['refresh_token']
+        refresh_token = data.get('refresh_token', None)
+        
 
         token_request = requests.post(
             f"https://kauth.kakao.com/oauth/token?grant_type={'refresh_token'}&client_id={CLIENT_ID}&refresh_token={refresh_token}",
@@ -213,3 +223,5 @@ def CommentDelete(request, kakao_id, comment_id):
     else:
         return JsonResponse({"status" : "GET 요청 받았음 / post로 보내"})
     # return redirect('post_list')
+
+    
