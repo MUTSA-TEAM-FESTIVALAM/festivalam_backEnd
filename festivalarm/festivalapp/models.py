@@ -7,34 +7,15 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 class User(AbstractUser):
-    kakao_id = models.CharField(blank=True, max_length=100)
-    email = models.EmailField(blank=True)    
+    kakao_id = models.CharField(blank=True, max_length=100, primary_key=True)
     username = models.CharField(unique='True', null=True, max_length=100)
-    access_token = models.CharField(null=True, max_length=255)
-    refresh_token = models.CharField(null=True, max_length=255)
-    password = models.CharField(null=True, max_length=100)
+    email = models.EmailField(blank=True)    
+
     
     def __str__(self):
         return self.username
-        
-"""
-class User(models.Model):
-    name = models.CharField(max_length=20)
 
-    def __str__(self):
-        return self.name
-"""
-# class Profile(models.Model):
-#     user= models.OneToOneField(User, on_delete=models.CASCADE,primary_key=True)
-#     nickname = models.CharField(max_length=20)
 
-#     def __str__(self):
-#         return self.nickname
-    
-#     @receiver(post_save, sender=User)
-#     def create_user_profile(sender, instance, created, **kwargs):
-#         if created:
-#               Profile.objects.create(user=instance)
 
 # # 페스티벌 장르 >>안하기로 결정
 # class Genre(models.Model):
