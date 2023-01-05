@@ -28,6 +28,46 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 
 
+# 작성중 ... 
+@method_decorator(csrf_exempt, name='dispatch')
+class KakaoLoginView(View):
+    def post(self, request) :
+        # 클라이언트로부터 token 전달 받기
+        data = json.loads(request.body)
+        access_token = data.get('access_token', None)
+
+        # if : access token 기한이 만료됐다면 refresh token으로 인증
+
+        # access_toekn을 통해 kakao에서 사용자 정보 받아오기 
+        profile_request = requests.post(
+            "https://kapi.kakao.com/v2/user/me", headers={"Authorization": f"Bearer {access_token}"}
+        )
+        profile_json = profile_request.json()
+
+        # DB에 사용자 정보 중 해당 id가 있는지 확인
+        if not User.objects.filter(kakao_id=profile_json.get('id')).exists():
+            # DB에 사용자 정보가 없는경우 --> 회원가입
+            user = User(
+                kakao_id = profile_json.get('id'),
+                username = profile_json.get("properties")["nickname"],
+                email = profile_json.get("kakao_account")["email"],
+            ).save()
+
+        # kakao_id를 통해 DB에서 사용자 정보 가져오기 
+        user_queryset = User.objects.filter(kakao_id=profile_json.get('id'))
+        user_json = json.loads(serializers.serialize('json', user_queryset))
+
+        user = User.objects.get(kakao_id=profile_json.get('id'))
+
+        # 유저의 access_token을 jwt를 통해 암호화하여 return
+        access_token = jwt.encode({'user_id': user.kakao_id}, SECRET_KEY, algorithm=ALGORITHMS)
+
+        return JsonResponse({'access_token': access_token}, status=201)
+
+      
+
+
+
 @method_decorator(csrf_exempt, name='dispatch')
 class KakaoSignInCallBackView(View):
     def post(self, request):
@@ -121,7 +161,13 @@ class KakaoUnlinkView(View):
 class KakaoUserProfileView(View):
     def get(self, request, kakao_id):
         
-        # 유저의 모든 정보 #
+        # 프론트에서 토큰을 전달 받기 
+        data = json.loads(request.body)
+        access_token = data.get('access_token', None)
+
+        # kakao_id = 전달받은 access_token을 복호화(jwt) 
+
+        # 유저의 모든 정보
         user_queryset = User.objects.filter(kakao_id=kakao_id)
         user_json = json.loads(serializers.serialize('json', user_queryset))
 
@@ -139,13 +185,14 @@ class KakaoUserProfileView(View):
 
         return JsonResponse({"user_profile" : user_json, 'user_post': user_post_json, 'user_comment': user_comment_json })
     
+    # 이름 수정
     def post(self, request, kakao_id):
         data = json.loads(request.body)
         new_name = data.get('name', None)
 
-        u = User.objects.get(kakao_id=kakao_id)
-        u.username = new_name
-        u.save()
+        user = User.objects.get(kakao_id=kakao_id)
+        user.username = new_name
+        user.save()
 
         user_queryset = User.objects.filter(kakao_id=kakao_id)
         user_json = json.loads(serializers.serialize('json', user_queryset))
