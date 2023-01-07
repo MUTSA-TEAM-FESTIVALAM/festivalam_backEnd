@@ -129,5 +129,6 @@ dmypy.json
 .pyre/
 
 festivalarm/my_secrets.py
+festivalarm/festivalapp/my_secrets.py
 
 myvenv

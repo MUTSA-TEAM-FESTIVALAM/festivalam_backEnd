@@ -37,7 +37,7 @@ class User(AbstractUser):
 class Festival(models.Model):
     title = models.CharField(blank=True, max_length=1000)
     ticket_link = models.URLField(blank=True,max_length = 1000)
-    Poster = models.CharField(blank=True,null=True,max_length=1000)
+    festival_image = models.ForeignKey(on_delete=models.CASCADE, null=True, related_name='festival_image') # 1:N 
     time_start = models.DateField(blank=True)
     time_end = models.DateField(blank=True)
     place = models.CharField(blank=True,max_length=1000)
@@ -113,7 +113,7 @@ class Post(models.Model):
     ) #null= true 로 페스티벌 정보 없이도 만들수있게
     title = models.TextField(blank=True)
     body = models.TextField(blank=True)
-    image = models.ImageField(blank=True) 
+    post_image = models.ForeignKey(on_delete=models.CASCADE, null=True, related_name='post_image')
     date = models.DateTimeField(auto_now_add=True)
     hits = models.IntegerField(blank=True)
     category = models.TextField(blank=True)
@@ -168,7 +168,7 @@ class Option(models.Model):
 
 class OptionCount(models.Model):
     # fesstival의 id를 fk로
-    festival= models.OneToOneField(Festival, on_delete=models.CASCADE,primary_key=True)
+    festival= models.OneToOneField(Festival, on_delete=models.CASCADE,primary_key=True,related_name='option_count')
     check_num=models.IntegerField(blank=True,default=0)
     option1 = models.IntegerField(blank=True,default=0)
     option2 = models.IntegerField(blank=True,default=0)
@@ -181,3 +181,17 @@ class OptionCount(models.Model):
     def create_festival_optioncount(sender, instance, created, **kwargs):
         if created:
               OptionCount.objects.create(festival=instance)
+              
+
+class FestivalImage(models.Model):
+    image_url = models.CharField(blank=True, max_length=200)
+    
+    class Meta:
+        db_table = 'festival_image'
+        
+    
+class PostImage(models.Model):
+    image_url = models.CharField(blank=True, max_length=200)
+    
+    class Meta:
+        db_table = 'post_image'
