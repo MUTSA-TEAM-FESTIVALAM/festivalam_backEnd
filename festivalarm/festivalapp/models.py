@@ -37,7 +37,7 @@ class User(AbstractUser):
 class Festival(models.Model):
     title = models.CharField(blank=True, max_length=1000)
     ticket_link = models.URLField(blank=True,max_length = 1000)
-    festival_image = models.ForeignKey(on_delete=models.CASCADE, null=True, related_name='festival_image') # 1:N 
+    festival_image = models.ForeignKey(on_delete=models.CASCADE, null=True, related_name='festival_images') # 1:N 
     time_start = models.DateField(blank=True)
     time_end = models.DateField(blank=True)
     place = models.CharField(blank=True,max_length=1000)
@@ -113,7 +113,7 @@ class Post(models.Model):
     ) #null= true 로 페스티벌 정보 없이도 만들수있게
     title = models.TextField(blank=True)
     body = models.TextField(blank=True)
-    post_image = models.ForeignKey(on_delete=models.CASCADE, null=True, related_name='post_image')
+    post_image = models.ForeignKey(on_delete=models.CASCADE, null=True, related_name='post_images')
     date = models.DateTimeField(auto_now_add=True)
     hits = models.IntegerField(blank=True)
     category = models.TextField(blank=True)
