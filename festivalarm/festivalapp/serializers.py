@@ -16,22 +16,25 @@ class UserSerializer(serializers.ModelSerializer):
 class FestivalImageSerializer(serializers.ModelSerializer):
     class Meta:
         model= FestivalImage
-        fields=['id','image_url']
+        fields=['id','festival_id','image_url']
         
 class PostImageSerializer(serializers.ModelSerializer):
     class Meta:
         model= PostImage
-        fields=['id','image_url']
+        fields=['id','post_id','image_url']
 
 
-class FestivalSerializer(serializers.ModelSerializer):
-    #Poster = serializers.ImageField()
-    # Poster = serializers.ImageField(use_url=True)
+class FestivalInfoSerializer(serializers.ModelSerializer):
     festival_images = FestivalImageSerializer(many=True, read_only=True)
     class Meta:
         model= Festival
         fields=['id','title','place', 'time_start', 'time_end','ticket_open','ticket_link','festival_images','lineup','hits']
-        
+
+class FestivalSaveSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model= Festival
+        fields=['id','title','place', 'time_start', 'time_end','ticket_open','ticket_link','lineup','hits']
 
 class PlaceSerializer(serializers.ModelSerializer):
     class Meta:
@@ -43,7 +46,7 @@ class PostSerializer(serializers.ModelSerializer):
     post_images = PostImageSerializer(many=True, read_only=True)
     class Meta:
         model= Post
-        fields=['id','author','festival','title','body','post_images','date','hits','category']
+        fields=['id','author','festival_id','title','body','post_images','date','hits','category']
 
 # class PostCreateSerializer(serializers.ModelSerializer):
 #     class Meta:
@@ -54,16 +57,16 @@ class CommentSerializer(serializers.ModelSerializer):
     author=UserSerializer(read_only=True)
     class Meta:
         model= Comment
-        fields=['id','author','post','comment','date']
+        fields=['id','author','post_id','comment','date']
         
 class OptionSerializer(serializers.ModelSerializer):
     
     class Meta:
         model= Option
-        fields=['id','festival','option1','option2','option3','option4','option5','option6']
+        fields=['id','festival_id','option1','option2','option3','option4','option5','option6']
           
 class OptionCountSerializer(serializers.ModelSerializer):
     class Meta:
         model= OptionCount
-        fields=['festival','option1','option2','option3','option4','option5','option6']
+        fields=['festival_id','option1','option2','option3','option4','option5','option6']
         
