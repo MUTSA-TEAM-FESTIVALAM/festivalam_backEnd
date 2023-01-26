@@ -7,7 +7,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 class User(AbstractUser):
-    kakao_id = models.CharField(blank=True, max_length=100, primary_key=True)
+    kakao_id = models.CharField(blank=True, max_length=100,unique=True)
     username = models.CharField(unique='True', null=True, max_length=100)
     email = models.EmailField(blank=True)    
 
@@ -104,7 +104,7 @@ class Post(models.Model):
     # )
      # 공연과 관련없는 게시글일수도 있잖아 --> 모델을 따로 만들어줘야하나?
     # fesstival의 id를 fk로
-    festival_id= models.ForeignKey(
+    festival= models.ForeignKey(
         Festival, 
         on_delete=models.CASCADE, 
         related_name='post_festsival',

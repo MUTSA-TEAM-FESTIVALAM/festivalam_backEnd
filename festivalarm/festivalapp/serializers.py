@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import OptionCount, User, Festival, Place, Post, Comment, Option,OptionCount,FestivalImage,PostImage
+from .models import OptionCount, User, Festival, Post, Comment, Option,OptionCount,FestivalImage,PostImage
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -48,10 +48,10 @@ class FestivalSaveSerializer(serializers.ModelSerializer):
         model= Festival
         fields=['id','title','place', 'time_start', 'time_end','ticket_open','ticket_link','lineup','hits']
 
-class PlaceSerializer(serializers.ModelSerializer):
-    class Meta:
-        model= Place
-        fields=['id','festival','name','name_adress','land_adress']
+# class PlaceSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model= Place
+#         fields=['id','festival','name','name_adress','land_adress']
         
 class PostSerializer(serializers.ModelSerializer):
     author=UserSerializer(read_only=True)

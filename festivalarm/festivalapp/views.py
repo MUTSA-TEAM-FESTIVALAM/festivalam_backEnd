@@ -7,7 +7,6 @@ from rest_framework.decorators import api_view
 from rest_framework.generics import get_object_or_404
 from .models import OptionCount, User, Festival, Post, Comment, Option
 from .serializers import OptionCountSerializer, UserSerializer, FestivalInfoSerializer,FestivalImageSerializer,FestivalSaveSerializer, PostSerializer,PostImageSerializer, CommentSerializer, OptionSerializer
-from .forms import PostForm,CommentForm
 from rest_framework.renderers import TemplateHTMLRenderer
 
 from festivalapp import ft_s3
