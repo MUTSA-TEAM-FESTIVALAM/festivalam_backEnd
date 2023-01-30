@@ -156,7 +156,6 @@ class KakaoUserProfileView(View):
         except jwt.exceptions.DecodeError:
             return JsonResponse({'message' : 'INVALID TOKEN'}, status = 400)
 
-
 # 로그아웃
 # token을 프론트에서 받아와서 쓴다면 수정 필요
 @method_decorator(csrf_exempt, name='dispatch')
@@ -195,8 +194,6 @@ class KakaoUnlinkView(View):
         #unlink_response = unlink_request.json()
         
         return JsonResponse({"status": 'unlink'})
-
-
     
 @method_decorator(csrf_exempt, name='dispatch')
 class UpdateNickname(View):
