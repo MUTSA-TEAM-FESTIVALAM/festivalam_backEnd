@@ -38,14 +38,22 @@ from django.utils.decorators import method_decorator
 class KakaoSignInCallBackView(View):
     def post(self, request) :
         
-        #--- 0. 프론트에서 jwt(kakao_access)를 넘겨줌 ---#
+        #--- 0. 프론트에서 jwt(인가코드)를 넘겨줌 ---#
 
         #--- 1. 넘어온 jwt토큰을 복호화 ---#
-        token = request.headers.get('Authorization', None)
-        access_token = decode_token(token)
-
-        #--- 2. if 복호화 성공하면 access를 얻음 ---#
+        token = request.GET.get('code')
+        code = decode_token(token)
+        
+        #--- 1.5 if 복호화 성공하면 인가코드를 얻음 ---#
         # 여기서 에러나는 경우는 decode_token() 메서드의 문제
+        
+        
+        #--- 2 인가코드로 kakao_access를 받아옴 ---#
+        token_request = requests.post(
+                f"https://kauth.kakao.com/oauth/token?grant_type=authorization_code&client_id={CLIENT_ID}&redirect_uri={REDIRECT_URI}&code={code}"
+            )
+        token_json = token_request.json()
+        access_token = token_json.get("access_token")
 
         #--- 3. access_toekn을 통해 kakao에서 사용자 정보 받아오기  ---#
         profile_request = requests.post(
