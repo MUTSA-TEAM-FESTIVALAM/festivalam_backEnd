@@ -9,6 +9,11 @@ from .models import OptionCount, User, Festival, Post, Comment, Option
 from .serializers import OptionCountSerializer, UserSerializer, FestivalInfoSerializer,FestivalImageSerializer,FestivalSaveSerializer, PostSerializer,PostImageSerializer, CommentSerializer, OptionSerializer
 from rest_framework.renderers import TemplateHTMLRenderer
 
+import json
+from accounts.tokens import *
+from django.core import serializers
+
+
 from festivalapp import ft_s3
 
 
@@ -252,7 +257,34 @@ class SearchFestivalTitleAPI(APIView):
 #class SearchOptionAPI(APIview):
 
 
+# --- 인증메서드 --- #
+def kakaoCertify(request):
+    try : 
+        #--- 프론트로부터 jwt 토큰을 전달 받기  ---#
+        jwt_token = request.headers.get('Authorization', None)
 
+        #--- Decoding ---#
+        temp = jwt_token.split(' ')
+        decoded = decode_token(temp)
+        result = decoded['subject'] # 디코딩이 제대로 됐다면 result = kakao_id
+        
+
+        #--- access 토큰이 유효하다면 ---#
+        if  User.objects.filter(kakao_id=result).exists():
+            
+            # 유저 뽑아오기
+            user_queryset = User.objects.filter(kakao_id=result)        
+            user_json = json.loads(serializers.serialize('json', user_queryset))
+
+            # user_queryset에서 username 뽑아오기
+            # username = user_queryset.values('username')[0]['username']
+
+            return user_json
+            
+    #--- access 토큰이 유요하지 않다면 ---#        
+    except jwt.exceptions.DecodeError:
+        message = "유효하지 않은 토큰입니다"
+        return message
 
 
 
