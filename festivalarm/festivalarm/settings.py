@@ -29,7 +29,6 @@ SECRET_KEY = my_secrets.SECRET_KEY
 DEBUG = True
 
 ALLOWED_HOSTS =['.ap-northeast-2.compute.amazonaws.com', '43.200.245.75', '127.0.0.1']
-#ALLOWED_HOSTS=[]
 
 # Application definition
 
@@ -172,6 +171,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 
-AWS_ACCESS_KEY_ID = my_secrets.AWS_ACCESS_KEY_ID
-AWS_SECRET_ACCESS_KEY = my_secrets.AWS_SECRET_ACCESS_KEY
+AWS_ACCESS_KEY_ID = my_secrets.AWS_S3_SECRET_ACCESS_KEY
+AWS_SECRET_ACCESS_KEY = my_secrets.AWS_S3_SECRET_ACCESS_KEY
 AWS_STORAGE_BUCKET_NAME = my_secrets.AWS_STORAGE_BUCKET_NAME

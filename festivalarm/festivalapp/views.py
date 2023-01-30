@@ -5,9 +5,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view
 from rest_framework.generics import get_object_or_404
-from .models import OptionCount, User, Festival, Place, Post, Comment, Option
-from .serializers import OptionCountSerializer, UserSerializer, FestivalSerializer, PlaceSerializer, PostSerializer, CommentSerializer, OptionSerializer
-from .forms import PostForm,CommentForm
+from .models import OptionCount, User, Festival, Post, Comment, Option
+from .serializers import OptionCountSerializer, UserSerializer, FestivalInfoSerializer,FestivalImageSerializer,FestivalSaveSerializer, PostSerializer,PostImageSerializer, CommentSerializer, OptionSerializer
 from rest_framework.renderers import TemplateHTMLRenderer
 
 from festivalapp import ft_s3
@@ -21,20 +20,31 @@ class FestivalsAPI(APIView):        # 페스티벌 전체목록
                                     #127.0.0.1:8000/festivalapp/festivals
     def get(self,request):          # 정보가져오기
         festivals= Festival.objects.all()
-        serializer = FestivalSerializer(festivals,many=True)
+        serializer = FestivalInfoSerializer(festivals,many=True)
         return Response(serializer.data,status=status.HTTP_200_OK)
     def post(self,request):
-        serializer = FestivalSerializer(data = request.data, many=True)
-        if(serializer.is_valid()):
-            serializer.save()
-            return Response(serializer.data ,status=200)
-        return Response(serializer.errors ,status=status.HTTP_400_BAD_REQUEST)
+        for i in range(len(request.data)):
+            image_json_arr = request.data[i]["festival_images"]
+            festival_data = request.data[i].pop("festival_images")
+            festival_serializer = FestivalSaveSerializer(data = festival_data)
+            if(festival_serializer.is_valid()):
+                festival = festival_serializer.save()
+                for k in range(len(image_json_arr)):
+                    image_json_arr[k].append({"festival_id" : festival["id"]})
+                    image_serializer = FestivalImageSerializer(image_json_arr[k])
+                    if(image_serializer.is_valid()):
+                        image_serializer.save()
+                    else :
+                        return Response(festival_serializer.errors ,status=status.HTTP_400_BAD_REQUEST)
+                return Response(festival_serializer.data ,status=200)
+            return Response(festival_serializer.errors ,status=status.HTTP_400_BAD_REQUEST)
+ 
     
 class FestivalAPI(APIView):        # 페스티벌 상세목록
-                                    #127.0.0.1:8000/festivalapp/festival/<int:fid> 
+                                    #127.0.0.1:8000/festivalapp/festival/<int:festival_id> 
     def get(self,request,festival_id):     # 정보가져오기
         festival= get_object_or_404(Festival,id=festival_id)
-        serializer = FestivalSerializer(festival)
+        serializer = FestivalInfoSerializer(festival)
         return Response(serializer.data,status=status.HTTP_200_OK)
 
 class PostsAPI(APIView):        # 게시글 전체목록

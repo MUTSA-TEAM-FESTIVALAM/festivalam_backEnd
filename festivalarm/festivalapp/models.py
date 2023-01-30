@@ -7,7 +7,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 class User(AbstractUser):
-    kakao_id = models.CharField(blank=True, max_length=100, primary_key=True)
+    kakao_id = models.CharField(blank=True, max_length=100,unique=True)
     username = models.CharField(unique='True', null=True, max_length=100)
     email = models.EmailField(blank=True)    
     kakao_access_token = models.CharField(blank=True, max_length=100, null=True)
@@ -38,8 +38,7 @@ class User(AbstractUser):
 # 페스티벌
 class Festival(models.Model):
     title = models.CharField(blank=True, max_length=1000)
-    ticket_link = models.URLField(blank=True,max_length = 1000)
-    Poster = models.CharField(blank=True,null=True,max_length=1000)
+    ticket_link = models.URLField(blank=True,max_length = 1000) 
     time_start = models.DateField(blank=True)
     time_end = models.DateField(blank=True)
     place = models.CharField(blank=True,max_length=1000)
@@ -59,23 +58,23 @@ class Festival(models.Model):
 
 
 # festival:place = 1:1
-class Place(models.Model):
-    # festival의 place를 fk로
-    festival = models.ForeignKey(
-        Festival, 
-        on_delete=models.CASCADE, 
-        related_name='place_festsival'
-    )
-    # catetory = models.ForeignKey(
-    #     Category,
-    #     on_delete = models.SET_NULL,
-    #     null = True,
-    #     related_name='like_festsival'
-    # )
-    name = models.CharField(blank=True, max_length=20)
-    name_address = models.CharField(blank=True, max_length=20) # 도로명주소
-    land_address = models.CharField(blank=True, max_length=20) # 지번주소
-    # parking = 이거 어떻게 지정해야되지?
+# class Place(models.Model):
+#     # festival의 place를 fk로
+#     festival = models.ForeignKey(
+#         Festival, 
+#         on_delete=models.CASCADE, 
+#         related_name='place_festsival'
+#     )
+#     # catetory = models.ForeignKey(
+#     #     Category,
+#     #     on_delete = models.SET_NULL,
+#     #     null = True,
+#     #     related_name='like_festsival'
+#     # )
+#     name = models.CharField(blank=True, max_length=20)
+#     name_address = models.CharField(blank=True, max_length=20) # 도로명주소
+#     land_address = models.CharField(blank=True, max_length=20) # 지번주소
+#     # parking = 이거 어떻게 지정해야되지?
 
 # user:like = 1:N     
 # class Like(models.Model):
@@ -107,15 +106,15 @@ class Post(models.Model):
     # )
      # 공연과 관련없는 게시글일수도 있잖아 --> 모델을 따로 만들어줘야하나?
     # fesstival의 id를 fk로
-    festival = models.ForeignKey(
+    festival= models.ForeignKey(
         Festival, 
         on_delete=models.CASCADE, 
         related_name='post_festsival',
-        null=True
+        null=True,
+        db_column="festival_id"
     ) #null= true 로 페스티벌 정보 없이도 만들수있게
     title = models.TextField(blank=True)
     body = models.TextField(blank=True)
-    image = models.ImageField(blank=True) 
     date = models.DateTimeField(auto_now_add=True)
     hits = models.IntegerField(blank=True)
     category = models.TextField(blank=True)
@@ -140,8 +139,10 @@ class Comment(models.Model):
         Post, 
         null=True, 
         on_delete=models.CASCADE,
-        related_name='comment_post'
+        related_name='comment_post',
+        db_column="post_id"
     )
+    
     comment = models.TextField()
     date = models.DateTimeField(auto_now_add=True)
 
@@ -170,7 +171,7 @@ class Option(models.Model):
 
 class OptionCount(models.Model):
     # fesstival의 id를 fk로
-    festival= models.OneToOneField(Festival, on_delete=models.CASCADE,primary_key=True)
+    festival= models.OneToOneField(Festival, on_delete=models.CASCADE,primary_key=True,related_name='option_count')
     check_num=models.IntegerField(blank=True,default=0)
     option1 = models.IntegerField(blank=True,default=0)
     option2 = models.IntegerField(blank=True,default=0)
@@ -183,3 +184,19 @@ class OptionCount(models.Model):
     def create_festival_optioncount(sender, instance, created, **kwargs):
         if created:
               OptionCount.objects.create(festival=instance)
+              
+
+class FestivalImage(models.Model):
+    festival_id = models.ForeignKey(Festival, related_name="festival_images", on_delete=models.CASCADE, db_column="festival_id")
+    image_url = models.CharField(blank=True, max_length=200)
+    
+    class Meta:
+        db_table = 'festival_image'
+        
+    
+class PostImage(models.Model):
+    post_id = models.ForeignKey(Post, related_name="post_images", on_delete=models.CASCADE, db_column="post_id")
+    image_url = models.CharField(blank=True, max_length=200)
+    
+    class Meta:
+        db_table = 'post_image'
