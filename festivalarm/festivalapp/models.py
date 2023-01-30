@@ -10,6 +10,8 @@ class User(AbstractUser):
     kakao_id = models.CharField(blank=True, max_length=100,unique=True)
     username = models.CharField(unique='True', null=True, max_length=100)
     email = models.EmailField(blank=True)    
+    kakao_access_token = models.CharField(blank=True, max_length=100, null=True)
+    refresh_token = models.CharField(blank=True, max_length=100,  null =True)
 
     
     def __str__(self):

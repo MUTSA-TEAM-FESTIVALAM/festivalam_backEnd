@@ -4,7 +4,7 @@ from .models import OptionCount, User, Festival, Post, Comment, Option,OptionCou
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model= User
-        fields=['id','kakao_id','email','username','access_token','refresh_token','password']
+        fields=['id','kakao_id','email','username','kakao_access_token','refresh_token','password']
 
 # class ProfileSerializer(serializers.ModelSerializer):
 #     user=UserSerializer(read_only=True)
