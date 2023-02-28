@@ -39,12 +39,12 @@ class User(AbstractUser):
 class Festival(models.Model):
     title = models.CharField(blank=True, max_length=1000)
     ticket_link = models.URLField(blank=True,max_length = 1000) 
-    time_start = models.DateField(blank=True)
-    time_end = models.DateField(blank=True)
+    time_start = models.DateTimeField(blank=True)
+    time_end = models.DateTimeField(blank=True)
     place = models.CharField(blank=True,max_length=1000)
     ticket_open = models.DateTimeField(blank=True,null=True)
     lineup = models.CharField(blank=True,max_length=1000)
-    hits = models.IntegerField(blank=True,default=0)
+    hits = models.IntegerField(blank=True,default = 0)
     likes = models.ManyToManyField(User,related_name='like',blank=True)
     # genre_id = models.ForeignKey(
     #     Genre,
