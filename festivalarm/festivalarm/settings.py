@@ -28,7 +28,7 @@ SECRET_KEY = my_secrets.SECRET_KEY
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS =['.ap-northeast-2.compute.amazonaws.com', '15.164.132.226', '127.0.0.1']
+ALLOWED_HOSTS =['*']
 
 # Application definition
 
