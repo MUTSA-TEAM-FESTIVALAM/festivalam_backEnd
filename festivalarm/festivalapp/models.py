@@ -2,16 +2,15 @@ from email.policy import default
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.forms import CharField, DateField, ImageField, IntegerField
-
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 class User(AbstractUser):
     kakao_id = models.CharField(blank=True, max_length=100,unique=True)
-    username = models.CharField(unique='True', null=True, max_length=100)
+    username = models.CharField(unique=True, null=True, max_length=100)
     email = models.EmailField(blank=True)    
     kakao_access_token = models.CharField(blank=True, max_length=100, null=True)
-    refresh_token = models.CharField(blank=True, max_length=100,  null =True)
+    refresh_token = models.CharField(blank=True, max_length=500, null=True)
 
     
     def __str__(self):

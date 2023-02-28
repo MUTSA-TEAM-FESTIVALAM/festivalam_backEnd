@@ -36,27 +36,30 @@ from django.utils.decorators import method_decorator
 # 로그인 메서드에 보내는 token은 kakao_token이라서 기간이 만료되는 일은 없을것.
 @method_decorator(csrf_exempt, name='dispatch')
 class KakaoSignInCallBackView(View):
-    def post(self, request) :
+    def post(self, request) :  
+
+        #--- 1. 프론트에서 jwt(인가코드)를 넘겨줌 ---#
+        data = json.loads(request.body)
+        code = data.get('code', None)
         
-        #--- 0. 프론트에서 jwt(kakao_access)를 넘겨줌 ---#
-
-        #--- 1. 넘어온 jwt토큰을 복호화 ---#
-        token = request.headers.get('Authorization', None)
-        access_token = decode_token(token)
-
-        #--- 2. if 복호화 성공하면 access를 얻음 ---#
-        # 여기서 에러나는 경우는 decode_token() 메서드의 문제
-
+        #--- 2 인가코드로 kakao_access를 받아옴 ---#
+        token_request = requests.post(
+                f"https://kauth.kakao.com/oauth/token?grant_type=authorization_code&client_id={CLIENT_ID}&redirect_uri={REDIRECT_URI}&code={code}"
+            )
+        token_json = token_request.json()
+        access_token = token_json.get("access_token")
+        print(access_token)
         #--- 3. access_toekn을 통해 kakao에서 사용자 정보 받아오기  ---#
         profile_request = requests.post(
             "https://kapi.kakao.com/v2/user/me", headers={"Authorization": f"Bearer {access_token}"}
         )
         profile_json = profile_request.json()
 
+        print(profile_json)
         #--- 4. DB에 사용자 정보 중 해당 id가 있는지 확인 ---#
         if not User.objects.filter(kakao_id=profile_json.get('id')).exists():
             # DB에 사용자 정보가 없는경우 --> 회원가입
-            user = User(
+            User(
                 kakao_id = profile_json.get('id'),
                 username = profile_json.get("properties")["nickname"],
                 email = profile_json.get("kakao_account")["email"],
@@ -148,7 +151,6 @@ class KakaoUserProfileView(View):
         except jwt.exceptions.DecodeError:
             return JsonResponse({'message' : 'INVALID TOKEN'}, status = 400)
 
-
 # 로그아웃
 # token을 프론트에서 받아와서 쓴다면 수정 필요
 @method_decorator(csrf_exempt, name='dispatch')
@@ -187,8 +189,6 @@ class KakaoUnlinkView(View):
         #unlink_response = unlink_request.json()
         
         return JsonResponse({"status": 'unlink'})
-
-
     
 @method_decorator(csrf_exempt, name='dispatch')
 class UpdateNickname(View):

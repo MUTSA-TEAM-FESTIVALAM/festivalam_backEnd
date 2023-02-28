@@ -43,7 +43,8 @@ INSTALLED_APPS = [
     'festivalapp',
     'corsheaders',
     'accounts',
-    'storages'
+    'storages',
+    'weathers'
 ]
 
 REST_FRAMEWORK = {
