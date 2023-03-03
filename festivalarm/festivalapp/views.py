@@ -204,7 +204,7 @@ class CountOptionAPI(APIView): #127.0.0.1:8000/festivalapp/festival/<int:festiav
     def get(self,request,festival_id):     
         festival=get_object_or_404(Festival,id=festival_id)
         option_count= get_object_or_404(OptionCount,festival=festival)
-        serializer = FestivalSerializer(option_count)
+        serializer = OptionCountSerializer(option_count)
         return Response(serializer.data,status=status.HTTP_200_OK)
     
 
@@ -251,7 +251,7 @@ class SearchPostTitleAPI(APIView): # 127.0.0.1:8000/festivalapp/search/post/
 class SearchFestivalTitleAPI(APIView):
     def get(self,request):       # search라는 매개변수로 검색할 내용을 받음 request.data 안에 search로 주기
         festivals=Festival.objects.filter(title__contains =request.data["search"]) | Festival.objects.filter(lineup__contains =request.data["search"])
-        serializer = FestivalSerializer(festivals,many=True)
+        serializer = FestivalInfoSerializer(festivals,many=True)
         return Response(serializer.data,status=status.HTTP_200_OK)
     
 #class SearchOptionAPI(APIview):

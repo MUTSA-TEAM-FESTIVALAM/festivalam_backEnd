@@ -28,7 +28,10 @@ SECRET_KEY = my_secrets.SECRET_KEY
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS =['*']
+ALLOWED_HOSTS =[
+    my_secrets.SECRET_DOMAIN,
+    'http://localhost:8000'
+]
 
 # Application definition
 
@@ -71,7 +74,13 @@ MIDDLEWARE = [
 #ALLOWED_HOSTS = ['127.0.0.1']
 # # 개인 ip 주소이다. 입력할 때 nn이 아닌 자신의 ip 주소를 입력하자.
 
-CORS_ORIGIN_WHITELIST = ['15.164.132.226']
+# CORS_ORIGIN_WHITELIST = [
+#     'https://festivalarm.click',
+#     'http://localhost:8000'
+# ]
+# CORS_ORIGIN_WHITELIST = [
+#     'http://localhost:8000'
+# ]
 
 CORS_ORIGIN_ALLOW_ALL=True
 CORS_ALLOW_CREDENTIALS = True
